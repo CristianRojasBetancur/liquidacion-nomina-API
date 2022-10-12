@@ -10,7 +10,9 @@ class AuthController < ApplicationController
       
       # redirect_to controller: "users", action: "show", id: @user.id
     else
-      render json: { error: 'Credenciales incorrectas' }, status: :unauthorized
+      render json: {error: {code: "002",
+                            message: 'Wrong credentials',
+                            object: "User"}}, status: :unauthorized
     end
   end
 

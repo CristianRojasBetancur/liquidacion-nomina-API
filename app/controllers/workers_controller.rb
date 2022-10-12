@@ -1,15 +1,37 @@
 class WorkersController < ApplicationController
-  before_action :set_worker, only: %i[ show update destroy ]
+  before_action :authorize_request
+  before_action :set_worker, only: %i[ update destroy ]
 
   # GET /workers
   # GET /workers.json
   def index
-    @workers = Worker.all
+    @workers = @current_user.company.workers
+
+    if @workers.nil?
+      render json: {error: {
+        code: "007",
+        message: "Your company don't have employees yet, register employees in POST /workers",
+        object: "Worker"
+      }}, status: 206
+    else
+      render :index, status: :ok
+    end
   end
 
   # GET /workers/1
   # GET /workers/1.json
   def show
+    begin
+      matched = Worker.where(id: params[:id]).where(company_id: @current_user.company.id)
+      @worker = matched[0]
+      render :show, status: :ok
+    rescue ActionView::Template::Error
+      render json: {error: {
+        code: "008",
+        message: "Couldn't find employeed with id #{params[:id]} for #{@current_user.company.name} company.",
+        Object: "Worker"
+      }}, status: 404
+    end
   end
 
   # POST /workers
@@ -18,9 +40,9 @@ class WorkersController < ApplicationController
     @worker = Worker.new(worker_params)
 
     if @worker.save
-      render :show, status: :created, location: @worker
+      render :show, status: :created
     else
-      render json: @worker.errors, status: :unprocessable_entity
+      render :errors, status: :unprocessable_entity
     end
   end
 
@@ -48,6 +70,11 @@ class WorkersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def worker_params
-      params.require(:worker).permit(:name, :cc, :a)
+      {
+        name: params[:worker][:name],
+        cc: params[:worker][:cc],
+        salary: params[:worker][:salary],
+        company_id: @current_user.company.id
+      }
     end
 end

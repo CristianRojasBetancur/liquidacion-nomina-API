@@ -10,7 +10,10 @@ class ApplicationController < ActionController::API
     rescue ActiveRecord::RecordNotFound => e
       render json: { errors: e.message }, status: :unauthorized
     rescue JWT::DecodeError => e
-      render json: { errors: "Debe iniciar sesión" }, status: :unauthorized
+      render json: {
+        error: {code: "001",
+                message: "You must be logged in",
+                object: "User" }}, status: :unauthorized
     end
   end
 end

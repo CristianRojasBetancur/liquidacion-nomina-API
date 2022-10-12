@@ -2,13 +2,17 @@ class CompaniesController < ApplicationController
   before_action :authorize_request
   before_action :validate_current_user_company, only: :create
   before_action :set_company, only: %i[ show destroy ]
+  before_action :set_current_user_company, only: %i[ index show ]
 
   # GET /companies
   # GET /companies.json
   def index
-    @company = Company.find_by(user_id: @current_user.id)
-    if @company.nil?
-      render json: { message: "#{@current_user.name} don't have company registered, register an company in POST /companies" }, status: 206
+    if @current_user_company.nil?
+      render json: { error: {
+        code: "003",
+        message: "#{@current_user.name} don't have company registered, register an company in POST /companies",
+        object: "Company"
+      } }, status: 206
     else
       render :index, status: :ok
     end
@@ -17,6 +21,15 @@ class CompaniesController < ApplicationController
   # GET /companies/1
   # GET /companies/1.json
   def show
+    if set_company.id == @current_user_company.id
+      render :show, status: :ok
+    else
+      render json: {error: {
+        code: "004",
+        message: "you can only see the companies that you own",
+        object: "Company"
+      }}, status: :unauthorized
+    end
   end
 
   # POST /companies
@@ -40,7 +53,19 @@ class CompaniesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_company
-      @company = Company.find(params[:id])
+      begin
+        @company = Company.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        render json: {error: {
+          code: "006",
+          message: "doesn't exist an company with id #{params[:id]}",
+          object: "Company"
+        }}, status: 404
+      end
+    end
+
+    def set_current_user_company
+      @current_user_company = Company.find_by(user_id: @current_user.id)
     end
 
     # Only allow a list of trusted parameters through.
