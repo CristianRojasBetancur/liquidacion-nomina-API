@@ -2,18 +2,18 @@ class CompaniesController < ApplicationController
   before_action :authorize_request
   before_action :validate_current_user_company, only: :create
   before_action :set_company, only: %i[ show destroy ]
-  before_action :set_current_user_company, only: %i[ index show ]
 
   # GET /companies
   # GET /companies.json
   def index
-    if @current_user_company.nil?
+    if @current_user.company.nil?
       render json: { error: {
         code: "003",
         message: "#{@current_user.name} don't have company registered, register an company in POST /companies",
         object: "Company"
       } }, status: 206
     else
+      @company = @current_user.company
       render :index, status: :ok
     end
   end
@@ -21,7 +21,7 @@ class CompaniesController < ApplicationController
   # GET /companies/1
   # GET /companies/1.json
   def show
-    if set_company.id == @current_user_company.id
+    if set_company.id == @current_user.company.id
       render :show, status: :ok
     else
       render json: {error: {

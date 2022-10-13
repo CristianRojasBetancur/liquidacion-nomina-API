@@ -1,6 +1,7 @@
 class WorkersController < ApplicationController
   before_action :authorize_request
   before_action :set_worker, only: %i[ update destroy ]
+  before_action :have_company?, only: %i[ create ]
 
   # GET /workers
   # GET /workers.json
@@ -76,5 +77,15 @@ class WorkersController < ApplicationController
         salary: params[:worker][:salary],
         company_id: @current_user.company.id
       }
+    end
+
+    def have_company?
+      if @current_user.company.nil?
+        render json: {error: {
+          code: "012",
+          message: "You must have a registered company to register employees, register an company in POST /companies",
+          object: "Worker"
+        }}
+      end
     end
 end

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :periods, only: [:index, :create, :show]
+  resources :payrolls
   resources :workers, only: [:index, :create, :show]
   resources :users
   resources :companies, only: [:index, :create, :show]

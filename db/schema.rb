@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_10_10_180658) do
+ActiveRecord::Schema[7.0].define(version: 2022_10_13_004824) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,6 +21,28 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_10_180658) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_companies_on_user_id"
+  end
+
+  create_table "payrolls", force: :cascade do |t|
+    t.bigint "period_id", null: false
+    t.integer "employeed_payment"
+    t.integer "reten_deduc"
+    t.integer "total_payrolls"
+    t.integer "social_benefits"
+    t.integer "parafiscal_cont"
+    t.integer "social_security"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["period_id"], name: "index_payrolls_on_period_id"
+  end
+
+  create_table "periods", force: :cascade do |t|
+    t.integer "year"
+    t.integer "month"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "company_id", null: false
+    t.index ["company_id"], name: "index_periods_on_company_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -43,5 +65,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_10_180658) do
   end
 
   add_foreign_key "companies", "users"
+  add_foreign_key "payrolls", "periods"
+  add_foreign_key "periods", "companies"
   add_foreign_key "workers", "companies"
 end
