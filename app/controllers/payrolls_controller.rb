@@ -1,9 +1,13 @@
 class PayrollsController < ApplicationController
+  include PayrollHelper
+
+  before_action:authorize_request
   before_action :set_payroll, only: %i[ show update destroy ]
 
   # GET /payrolls
   # GET /payrolls.json
   def index
+    payroll_params
     @payrolls = Payroll.all
   end
 
@@ -44,10 +48,5 @@ class PayrollsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_payroll
       @payroll = Payroll.find(params[:id])
-    end
-
-    # Only allow a list of trusted parameters through.
-    def payroll_params
-      params.require(:payroll).permit(:period_id, :employeed_payment, :reten_deduc, :total_payrolls, :social_benefits, :parafiscal_cont, :social_security)
     end
 end

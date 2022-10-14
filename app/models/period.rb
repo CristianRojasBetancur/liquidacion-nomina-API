@@ -1,5 +1,5 @@
 class Period < ApplicationRecord
-  has_one :payroll, dependent: :destroy
+  has_many :payroll, dependent: :destroy
   belongs_to :company
 
   validates :year, inclusion: {in: (2000..2022), message: "Only can generate a payroll beetwen 2000 and 2022.", code: "009"}
