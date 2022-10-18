@@ -13,7 +13,7 @@ class WorkersController < ApplicationController
         code: "007",
         message: "Your company don't have employees yet, register employees in POST /workers",
         object: "Worker"
-      }}, status: 206
+      }}, status: 404
     else
       render :index, status: :ok
     end
@@ -75,7 +75,9 @@ class WorkersController < ApplicationController
         name: params[:worker][:name],
         cc: params[:worker][:cc],
         salary: params[:worker][:salary],
-        company_id: @current_user.company.id
+        company_id: @current_user.company.id,
+        risk: params[:worker][:risk],
+        transport_subsidy: params[:worker][:transport_subsidy]
       }
     end
 

@@ -6,5 +6,6 @@ json.data do
     json.name e.name
     json.cc e.cc
     json.salary e.salary
+    json.laboral_risk e.risk
   end
 end

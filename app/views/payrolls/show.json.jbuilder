@@ -1,1 +1,3 @@
-json.partial! "payrolls/payroll", payroll: @payroll
+json.data do
+  json.payroll "se liquidó"
+end

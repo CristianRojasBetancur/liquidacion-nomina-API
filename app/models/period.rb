@@ -1,5 +1,5 @@
 class Period < ApplicationRecord
-  has_many :payroll, dependent: :destroy
+  has_many :payrolls, dependent: :destroy
   belongs_to :company
 
   validates :year, inclusion: {in: (2000..2022), message: "Only can generate a payroll beetwen 2000 and 2022.", code: "009"}
@@ -19,8 +19,8 @@ class Period < ApplicationRecord
   end
 
   def settled_payroll?
-    actual_period = Period.last
+    payrolls_actual_period = Period.last.payrolls if Period.last
 
-    errors.add(:base, "you cannot create another period until you settle payroll for the current period", code: "013") if actual_period.payroll.nil?
+    errors.add(:base, "you cannot create another period until you settle payroll for the current period", code: "013") if payrolls_actual_period == [] && Period.all.size >= 1
   end
 end

@@ -1,14 +1,16 @@
 class PayrollsController < ApplicationController
   include PayrollHelper
 
-  before_action:authorize_request
+  before_action :authorize_request
+  before_action :at_leat_one_period_created, only: :create
   before_action :set_payroll, only: %i[ show update destroy ]
 
   # GET /payrolls
   # GET /payrolls.json
   def index
-    payroll_params
-    @payrolls = Payroll.all
+    @payrolls = Period.last&.payrolls
+
+    render :index, status: :ok
   end
 
   # GET /payrolls/1
@@ -19,12 +21,14 @@ class PayrollsController < ApplicationController
   # POST /payrolls
   # POST /payrolls.json
   def create
-    @payroll = Payroll.new(payroll_params)
-
-    if @payroll.save
-      render :show, status: :created, location: @payroll
-    else
-      render json: @payroll.errors, status: :unprocessable_entity
+    begin
+      settle_payroll
+    rescue NoMethodError
+      render json: {error: {
+        code: "016",
+        message: "You can't settle payroll without create a period",
+        object: "Payroll"
+      }}
     end
   end
 
@@ -48,5 +52,15 @@ class PayrollsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_payroll
       @payroll = Payroll.find(params[:id])
+    end
+
+    def at_leat_one_period_created
+      if Period.all.size == 0
+        render json: {error: {
+          code: "016",
+          message: "You can't settle payroll without create a period",
+          object: "Payrrol"
+        }}
+      end
     end
 end
