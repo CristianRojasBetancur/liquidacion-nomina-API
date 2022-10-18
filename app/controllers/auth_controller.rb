@@ -6,7 +6,9 @@ class AuthController < ApplicationController
     @user = User.find_by_email(params[:email])
     if @user&.authenticate(params[:password])
       token = encode(user_id: @user.id)
-      render json: { token: token, name: @user.name }, status: :ok
+      render json: { data: {
+        token: token, name: @user.name
+      }}, status: :ok
       
       # redirect_to controller: "users", action: "show", id: @user.id
     else

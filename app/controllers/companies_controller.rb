@@ -11,7 +11,7 @@ class CompaniesController < ApplicationController
         code: "003",
         message: "#{@current_user.name} don't have company registered, register an company in POST /companies",
         object: "Company"
-      } }, status: 206
+      } }, status: 404
     else
       @company = @current_user.company
       render :index, status: :ok
@@ -79,7 +79,11 @@ class CompaniesController < ApplicationController
 
     def validate_current_user_company
       unless @current_user.company.nil?
-        render json: { error: "#{@current_user.name} already has an company registered."}, status: :unprocessable_entity
+        render json: { error: {
+          code: "016",
+          message: "#{@current_user.name} already has an company registered.",
+          object: "Company"
+        }}, status: :unprocessable_entity
       end
     end
 end
