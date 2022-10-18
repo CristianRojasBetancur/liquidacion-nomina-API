@@ -61,4 +61,19 @@ class PayrollsController < ApplicationController
         }}
       end
     end
+
+    def same_year_and_month
+      year_to_value = @current_user.company.periods.find(year: self.year)
+      month_to_value = @current_user.company.periods.find(month: self.month)
+  
+      # errors.add(:base, "This period already exists", code: "010") if year_to_value && month_to_value
+
+      if year_to_value && month_to_value
+        render json: {error: {
+          code: "028",
+          message: "You can't settle payroll without create a period",
+          object: "Payrrol"
+        }}
+      end
+    end
 end

@@ -1,7 +1,6 @@
 class PeriodsController < ApplicationController
   before_action :authorize_request
   before_action :same_year_and_month, :settled_payroll?, only: :create
-  before_action :have_company?, only: :index
 
   def index
     @periods = @current_user.company.periods

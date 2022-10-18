@@ -10,15 +10,15 @@ class PayrollsController < ApplicationController
   def index
     @payrolls = Period.last&.payrolls
 
-    begin
-      render :index, status: :ok
-    rescue ActionView::Template::Error
-      render json: {error: {
-        code: "027",
-        message: "You haven't payrolls",
-        object: "Period"
-      }}
-    end
+  begin
+    render :index, status: :ok
+  rescue ActionView::Template::Error
+    render json: {error: {
+      code: "027",
+      message: "You haven't payrolls",
+      object: "Period"
+    }}
+  end
   end
 
   # GET /payrolls/1
@@ -40,6 +40,16 @@ class PayrollsController < ApplicationController
     end
   end
 
+  # PATCH/PUT /payrolls/1
+  # PATCH/PUT /payrolls/1.json
+  def update
+    if @payroll.update(payroll_params)
+      render :show, status: :ok, location: @payroll
+    else
+      render json: @payroll.errors, status: :unprocessable_entity
+    end
+  end
+
   # DELETE /payrolls/1
   # DELETE /payrolls/1.json
   def destroy
@@ -53,7 +63,7 @@ class PayrollsController < ApplicationController
     end
 
     def at_leat_one_period_created
-      if @current_user.company.periods.size == 0
+      if Period.all.size == 0
         render json: {error: {
           code: "016",
           message: "You can't settle payroll without create a period",

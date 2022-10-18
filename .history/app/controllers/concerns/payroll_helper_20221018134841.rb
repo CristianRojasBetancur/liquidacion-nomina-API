@@ -8,12 +8,11 @@ module PayrollHelper
   def settle_payroll
     total_payrolls = 0
     total_social_benefits = 0
-    if @current_user.company.workers == []
+    if @current_user.company.workers.nil?
       render json: {error: {
         code: "029",
-        message: "You cannot settle payroll because your company haven't workers",
-        object: "Payroll"
-      }}, status: 404
+        message: "You cannot settle payroll because your company haven't workers"
+      }}
     else
       @current_user.company.workers.each do |worker|
         base_salary = worker.salary
@@ -53,8 +52,8 @@ module PayrollHelper
           total_company_cost: total_company_cost
         })
       end
-      render :show, status: :ok
     end
+    render :show, status: :ok
   end
 
   def withholdings_and_deductions(total_base_SS_parafiscal)

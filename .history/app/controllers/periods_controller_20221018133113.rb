@@ -1,19 +1,34 @@
 class PeriodsController < ApplicationController
   before_action :authorize_request
-  before_action :same_year_and_month, :settled_payroll?, only: :create
-  before_action :have_company?, only: :index
+  before_action :same_year_and_month, only: :create
 
   def index
-    @periods = @current_user.company.periods
+    begin
+      @periods = @current_user.company.periods
 
-    if @periods != []
-      render :index, status: :ok
-    else
+      if @periods.eql?([])
+        begin
+          render :index, status: :ok
+        rescue ActionView::Template::Error
+          render json: {error: {
+            code: "027",
+            message: "You haven't payrolls",
+            object: "Period"
+          }}
+        end
+      else
+        render json: {error: {
+          code: "012",
+          message: "Couldn't find periods for #{@current_user.company.name} company.",
+          object: "Period"
+        }}, status: 404
+      end
+    rescue NoMethodError
       render json: {error: {
-        code: "012",
-        message: "Couldn't find periods for #{@current_user.company.name} company.",
+        code: "027",
+        message: "You don't have a company registered",
         object: "Period"
-      }}, status: 404
+      }}
     end
   end
 
@@ -58,25 +73,8 @@ class PeriodsController < ApplicationController
   end
 
   def settled_payroll?
-    payrolls_actual_period = @current_user.company.periods.last.payrolls if @current_user.company.periods.last
+    payrolls_actual_period = Period.last.payrolls if Period.last
 
-    # errors.add(:base, "you cannot create another period until you settle payroll for the current period", code: "013") if payrolls_actual_period == [] && Period.all.size >= 1
-
-    if payrolls_actual_period == [] && @current_user.company.periods.size >= 1
-      render json: {error: {
-        code: "013",
-        message: "you cannot create another period until you settle payroll for the current period",
-        object: "Period"
-      }}
-    end
-  end
-
-  def have_company?
-    if @current_user.company.nil?
-      render json: {error: {
-        code: "030",
-        message: "You haven't a company registered"
-      }}
-    end
+    errors.add(:base, "you cannot create another period until you settle payroll for the current period", code: "013") if payrolls_actual_period == [] && Period.all.size >= 1
   end
 end

@@ -1,3 +1,3 @@
 json.data do
-  json.payroll "se liquidó"
+  json.payroll "¡settled!"
 end

@@ -1,6 +1,6 @@
 class Payroll < ApplicationRecord
   belongs_to :period, dependent: :destroy
-  belongs_to :worker
+  belongs_to :worker, dependent: :destroy
 
   validate :can_settle_payroll, :no_repeat_payroll_for_same_employee
 

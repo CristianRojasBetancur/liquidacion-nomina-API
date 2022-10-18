@@ -1,19 +1,26 @@
 class PeriodsController < ApplicationController
   before_action :authorize_request
   before_action :same_year_and_month, :settled_payroll?, only: :create
-  before_action :have_company?, only: :index
 
   def index
-    @periods = @current_user.company.periods
+    begin
+      @periods = @current_user.company.periods
 
-    if @periods != []
-      render :index, status: :ok
-    else
+      if @periods != []
+        render :index, status: :ok
+      else
+        render json: {error: {
+          code: "012",
+          message: "Couldn't find periods for #{@current_user.company.name} company.",
+          object: "Period"
+        }}, status: 404
+      end
+    rescue NoMethodError
       render json: {error: {
-        code: "012",
-        message: "Couldn't find periods for #{@current_user.company.name} company.",
+        code: "027",
+        message: "You don't have a company registered",
         object: "Period"
-      }}, status: 404
+      }}
     end
   end
 
@@ -67,15 +74,6 @@ class PeriodsController < ApplicationController
         code: "013",
         message: "you cannot create another period until you settle payroll for the current period",
         object: "Period"
-      }}
-    end
-  end
-
-  def have_company?
-    if @current_user.company.nil?
-      render json: {error: {
-        code: "030",
-        message: "You haven't a company registered"
       }}
     end
   end

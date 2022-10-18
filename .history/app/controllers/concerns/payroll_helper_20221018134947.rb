@@ -13,7 +13,7 @@ module PayrollHelper
         code: "029",
         message: "You cannot settle payroll because your company haven't workers",
         object: "Payroll"
-      }}, status: 404
+      }}
     else
       @current_user.company.workers.each do |worker|
         base_salary = worker.salary

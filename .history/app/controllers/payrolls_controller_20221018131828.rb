@@ -48,17 +48,17 @@ class PayrollsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_payroll
-      @payroll = Payroll.find(params[:id])
-    end
+  def set_payroll
+    @payroll = Payroll.find(params[:id])
+  end
 
-    def at_leat_one_period_created
-      if @current_user.company.periods.size == 0
-        render json: {error: {
-          code: "016",
-          message: "You can't settle payroll without create a period",
-          object: "Payrrol"
-        }}
-      end
+  def at_leat_one_period_created
+    if @current_user.company.periods.size == 0
+      render json: {error: {
+        code: "016",
+        message: "You can't settle payroll without create a period",
+        object: "Payrrol"
+      }}
     end
+  end
 end

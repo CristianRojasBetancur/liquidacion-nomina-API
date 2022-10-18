@@ -8,12 +8,12 @@ module PayrollHelper
   def settle_payroll
     total_payrolls = 0
     total_social_benefits = 0
-    if @current_user.company.workers == []
+    if @current_user.company.workers.nil?
       render json: {error: {
         code: "029",
         message: "You cannot settle payroll because your company haven't workers",
         object: "Payroll"
-      }}, status: 404
+      }}
     else
       @current_user.company.workers.each do |worker|
         base_salary = worker.salary
