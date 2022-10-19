@@ -9,8 +9,11 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'sign up and log in user one' do
-    login(@valid_user)
+    user_one = { email: 'userone@test.com', password: 'password' }
+    login(user_one)
+    assert_response :success
 
+    (user_one)
     assert_response :success
   end
 end

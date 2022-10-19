@@ -17,5 +17,5 @@ valid_user:
 
 invalid_user:
   name: Mariana
-  email: andres@andres.com
+  email: mariana@mariana.com
   password_digest: <%= BCrypt::Password.create('combinacion1234') %>
