@@ -86,6 +86,6 @@ class PayrollTest < ActiveSupport::TestCase
   test 'no_repeat_payroll_for_same_employee' do
     payroll_two = @payroll.dup
 
-    assert_not payroll_two.valid?, "You haven't two payrolls for the same employee in the same period"
+    assert_not payroll_two.valid?, "You can't settle payroll in a period that already settled payroll"
   end
 end
