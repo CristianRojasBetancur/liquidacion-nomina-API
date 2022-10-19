@@ -45,20 +45,12 @@ class PayrollsController < ApplicationController
     end
 
     def at_leat_one_period_created
-      if @current_user.company.nil?  
+      if @current_user.company.periods.size == 0
         render json: {error: {
-          code: "030",
-          message: "You haven't a company registered, register a company in POST /companies",
-          object: "Period"
-        }}, status: 404
-      else
-        if @current_user.company.periods.size == 0
-          render json: {error: {
-            code: "016",
-            message: "You can't settle payroll without create a period",
-            object: "Payrrol"
-          }}
-        end
+          code: "016",
+          message: "You can't settle payroll without create a period",
+          object: "Payrrol"
+        }}
       end
     end
 
@@ -78,7 +70,7 @@ class PayrollsController < ApplicationController
           code: "030",
           message: "You don't have a company registered, register a company in POST /companies",
           object: "Payroll"
-        }}, status: 404
+        }}
       end
     end
 end

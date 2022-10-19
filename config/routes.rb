@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :modifications
   resources :periods, only: [:index, :create, :show]
   resources :payrolls
   resources :workers, only: [:index, :create, :show]

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_10_19_205303) do
+ActiveRecord::Schema[7.0].define(version: 2022_10_19_224834) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,6 +21,18 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_19_205303) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_companies_on_user_id"
+  end
+
+  create_table "modifications", force: :cascade do |t|
+    t.bigint "period_id", null: false
+    t.bigint "worker_id", null: false
+    t.integer "other_salary_incomes"
+    t.integer "no_salary_incomes"
+    t.integer "deductions"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["period_id"], name: "index_modifications_on_period_id"
+    t.index ["worker_id"], name: "index_modifications_on_worker_id"
   end
 
   create_table "payrolls", force: :cascade do |t|
@@ -69,6 +81,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_10_19_205303) do
   end
 
   add_foreign_key "companies", "users"
+  add_foreign_key "modifications", "periods"
+  add_foreign_key "modifications", "workers"
   add_foreign_key "payrolls", "periods"
   add_foreign_key "payrolls", "workers"
   add_foreign_key "periods", "companies"

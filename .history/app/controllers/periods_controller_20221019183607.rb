@@ -43,17 +43,9 @@ class PeriodsController < ApplicationController
     year_to_value = nil
     month_to_value = nil
 
-    if @current_user.company.nil?
-      render json: {error: {
-        code: "030",
-        message: "You haven't a company registered, register a company in POST /companies",
-        object: "Period"
-      }}, status: 404
-    else
-      @current_user.company.periods.each do |period|
-        year_to_value = period.year if period.year.eql?(params[:period][:year])
-        month_to_value = period.month if period.month.eql?(params[:period][:month])
-      end
+    @current_user.company.periods.each do |period|
+      year_to_value = period.year if period.year.eql?(params[:period][:year])
+      month_to_value = period.month if period.month.eql?(params[:period][:month])
     end
 
     # errors.add(:base, "This period already exists", code: "010") if year_to_value && month_to_value

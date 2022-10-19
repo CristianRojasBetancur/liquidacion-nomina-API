@@ -46,9 +46,8 @@ class PeriodsController < ApplicationController
     if @current_user.company.nil?
       render json: {error: {
         code: "030",
-        message: "You haven't a company registered, register a company in POST /companies",
-        object: "Period"
-      }}, status: 404
+        message: "You haven't a company registered, register a company in POST /companiers"
+      }}
     else
       @current_user.company.periods.each do |period|
         year_to_value = period.year if period.year.eql?(params[:period][:year])

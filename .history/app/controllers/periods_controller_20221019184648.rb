@@ -48,7 +48,7 @@ class PeriodsController < ApplicationController
         code: "030",
         message: "You haven't a company registered, register a company in POST /companies",
         object: "Period"
-      }}, status: 404
+      }}
     else
       @current_user.company.periods.each do |period|
         year_to_value = period.year if period.year.eql?(params[:period][:year])

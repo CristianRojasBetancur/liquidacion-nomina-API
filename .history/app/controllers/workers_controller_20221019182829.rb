@@ -1,7 +1,7 @@
 class WorkersController < ApplicationController
   before_action :authorize_request
   before_action :set_worker, only: %i[ update destroy ]
-  before_action :have_company?, only: %i[ create index show ]
+  before_action :have_company?, only: %i[ create index ]
 
   # GET /workers
   # GET /workers.json

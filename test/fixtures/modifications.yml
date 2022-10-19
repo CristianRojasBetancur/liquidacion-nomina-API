@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  period: one
+  worker: one
+  other_salary_incomes: 1
+  no_salary_incomes: 1
+  deductions: 1
+
+two:
+  period: two
+  worker: two
+  other_salary_incomes: 1
+  no_salary_incomes: 1
+  deductions: 1
