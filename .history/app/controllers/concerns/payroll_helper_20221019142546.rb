@@ -32,11 +32,10 @@ module PayrollHelper
         no_salary_incomes = 0 # Por ahora cero luego será según las modificaciones del empleado
         total_incomes = total_base_social_benefits + no_salary_incomes
         employee_payment = total_incomes - withholdings_and_deductions(total_base_SS_parafiscal)
-        company_cost = total_incomes + social_security(total_base_SS_parafiscal, worker) + parafiscal_contribution(total_base_SS_parafiscal) + social_benefits(total_base_social_benefits, total_base_SS_parafiscal)
-        puts "******************** costo empresa por #{worker.name} #{company_cost} *********************"
+        company_total_cost = total_incomes + social_security(total_base_SS_parafiscal, worker) + parafiscal_contribution(total_base_SS_parafiscal) + social_benefits(total_base_social_benefits, total_base_SS_parafiscal)
         total_payrolls += employee_payment
-        total_social_benefits += social_benefits(total_base_social_benefits, total_base_SS_parafiscal) + social_security(total_base_SS_parafiscal, worker)
-        total_company_cost += company_cost
+        total_social_benefits += social_benefits(total_base_social_benefits, total_base_SS_parafiscal)
+        total_company_cost = total_payrolls + social_security(total_base_SS_parafiscal, worker) + parafiscal_contribution(total_base_SS_parafiscal) + social_benefits(total_base_social_benefits, total_base_SS_parafiscal)
         puts "**************** total costo empresa #{total_company_cost} *******************"
         puts "**************** total seguridad social #{total_social_benefits} *******************"
 

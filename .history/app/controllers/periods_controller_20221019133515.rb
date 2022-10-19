@@ -6,7 +6,7 @@ class PeriodsController < ApplicationController
   def index
     @periods = @current_user.company.periods
 
-    puts "******************* #{@periods == []} **********************"
+    puts "******************* #{@periods[0].payroll} **********************"
 
     if @periods != []
       render :index, status: :ok

@@ -7,11 +7,11 @@ json.data do
           json.social_benefits @payrolls.last.social_benefits
           json.total_company_cost @payrolls.last.total_company_cost
         end
-        json.employees @payrolls.each do |payroll|
-          json.name @current_user.company.workers.find_by(id: payroll.worker_id).name
-          json.base_salary @current_user.company.workers.find_by(id: payroll.worker_id).salary
-          json.employee_payment payroll.employeed_payment
-          json.deductions payroll.reten_deduc
+        json.employees @payrolls.each do |worker|
+          json.name worker.name
+          json.base_salary worker.salary
+          json.employee_payment 
+          json.deductions nil
           json.payroll_mods nil
         end
       else

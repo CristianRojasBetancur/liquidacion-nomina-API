@@ -2,7 +2,7 @@ class PayrollsController < ApplicationController
   include PayrollHelper
 
   before_action :authorize_request
-  before_action :at_leat_one_period_created, :cant_settle_payroll_in_same_period, only: :create
+  before_action :at_leat_one_period_created, only: :create
   before_action :set_payroll, only: %i[ show update destroy ]
 
   # GET /payrolls
@@ -60,7 +60,7 @@ class PayrollsController < ApplicationController
           code: "031",
           message: "You already settled payroll in this period",
           object: "Payrrol"
-        }}, status: :unprocessable_entity
+        }}
       end
     end
 end

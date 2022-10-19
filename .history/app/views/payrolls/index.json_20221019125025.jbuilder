@@ -6,16 +6,19 @@ json.data do
           json.total_payrolls @payrolls.last.total_payrolls
           json.social_benefits @payrolls.last.social_benefits
           json.total_company_cost @payrolls.last.total_company_cost
-        end
-        json.employees @payrolls.each do |payroll|
-          json.name @current_user.company.workers.find_by(id: payroll.worker_id).name
-          json.base_salary @current_user.company.workers.find_by(id: payroll.worker_id).salary
-          json.employee_payment payroll.employeed_payment
-          json.deductions payroll.reten_deduc
-          json.payroll_mods nil
+          json.employees @current_user.company.workers.each do |worker|
+
+          end
         end
       else
-        []
+        json.payroll nil
+        json.employees @current_user.company.workers.each do |worker|
+          json.name worker.name
+          json.base_salary worker.salary
+          json.employee_payment nil
+          json.deductions nil
+          json.payroll_mods
+        end
       end
     end
   end

@@ -60,7 +60,7 @@ class PayrollsController < ApplicationController
           code: "031",
           message: "You already settled payroll in this period",
           object: "Payrrol"
-        }}, status: :unprocessable_entity
+        }}
       end
     end
 end
