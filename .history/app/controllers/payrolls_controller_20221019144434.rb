@@ -3,12 +3,14 @@ class PayrollsController < ApplicationController
 
   before_action :authorize_request
   before_action :at_leat_one_period_created, :cant_settle_payroll_in_same_period, only: :create
+  before_action :at_leat_one_period_created, only: :index
   before_action :set_payroll, only: %i[ show update destroy ]
 
   # GET /payrolls
   # GET /payrolls.json
   def index
-    @payrolls = @current_user.company.periods.last.payrolls unless @current_user.company.periods.last.nil?
+    @payrolls = @current_user.company.periods.last.payrolls
+    p "****************** #{@payrolls.last} **********************"
     render :index, status: :ok
   end
 

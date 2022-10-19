@@ -8,7 +8,8 @@ class PayrollsController < ApplicationController
   # GET /payrolls
   # GET /payrolls.json
   def index
-    @payrolls = @current_user.company.periods.last.payrolls unless @current_user.company.periods.last.nil?
+    @payrolls = @current_user.company.periods.last.payrolls
+    p "****************** #{@payrolls.last} **********************"
     render :index, status: :ok
   end
 
