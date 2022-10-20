@@ -1,0 +1,53 @@
+module ValidationsHelper
+  extend ActiveSupport::Concern
+
+  private
+
+  def have_company?
+    if @current_user.company.nil?
+      render json: {error: {
+        code: "030",
+        message: "You haven't a company registered",
+        object: "Period"
+      }}, status: 404
+    end
+  end
+
+  def have_workers?
+    if @current_user.company.workers == []
+      render json: {error: {
+        code: "029",
+        message: "You don't have employees",
+        object: "Modifications"
+      }}, status: 404
+    end
+  end
+
+  def at_leat_one_period_created
+    if @current_user.company.nil?  
+      render json: {error: {
+        code: "030",
+        message: "You haven't a company registered, register a company in POST /companies",
+        object: "Period"
+      }}, status: 404
+    else
+      if @current_user.company.periods.size == 0
+        render json: {error: {
+          code: "016",
+          message: "You can't settle payroll without create a period",
+          object: "Payrrol"
+        }}
+      end
+    end
+  end
+
+  def cant_settle_payroll_in_same_period
+    if @current_user.company.periods.last.payrolls != []
+      render json: {error: {
+        code: "031",
+        message: "You already settled payroll in this period",
+        object: "Payrrol"
+      }}, status: :unprocessable_entity
+    end
+  end
+end
