@@ -89,7 +89,7 @@ module ValidationsHelper
         code: "013",
         message: "you cannot create another period until you settle payroll for the current period",
         object: "Period"
-      }}, status: 422
+      }}
     end
   end
 
