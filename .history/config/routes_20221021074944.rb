@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
-  
   resources :modifications
   resources :periods, only: [:index, :create, :show]
   resources :payrolls
@@ -11,4 +10,7 @@ Rails.application.routes.draw do
 
   # Auth route
   post '/login', to: "auth#login"
+
+  mount Rswag::Ui::Engine => "/api-docs"
+  mount Rswag::Api::Engine => "/api-docs"
 end

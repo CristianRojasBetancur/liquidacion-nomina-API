@@ -1,0 +1,915 @@
+openapi: 3.0.1
+info:
+  title: API Liquidar Nómina😎
+  description: Esta API permite liquidar nómina de manera automática para los empleados de una empresa.
+  version: 1.0.0
+servers:
+- url: http://localhost:3000
+tags:
+- name: users
+  description: Este endpoint administra la información de los usuarios que usarán la API.
+- name: companies
+  description: Este endpoint administra la información de las empresas de un usuario.
+- name: workers
+  description: Este endpoint se encarga de administrar la informacion de los empleados.
+- name: periods
+  description: Este endpoint administra la información de los periodos de nómina.
+- name: payroll_modifications
+  description: Este endpoint administra las modificaciones que puede realizarse sobre un empleado en su nómina
+- name: payrolls
+  description: Este endpoint se encarga de liquidar nómina y administrar la información de las nóminas
+  
+paths:
+  /users:
+    post:
+      tags:
+      - users
+      summary: Registra un nuevo usuario en la BD.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BodyUsersPost'
+        required: true
+      responses:
+        200:
+          description: (OK) Se creó el usuario correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkUsersPost'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/ServerError'
+  
+  /login:
+    post:
+      tags:
+      - users
+      summary: Logea un usuario registrado y genera el token de autenticación.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BodyLoginPost'
+        required: true
+      responses:
+        200:
+          description: (OK) Inició sesión correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkLoginPost'
+        401:
+          description: (Unauthorized) Credenciales incorrectas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /companies:
+    post:
+      tags:
+      - companies
+      summary: Registra una empresa para el usuario actual.
+      parameters:
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BodyRegisterCompany'
+        required: true
+      responses:
+        200:
+          description: (OK) se registró la empresa correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkRegisterCompanyPost'
+        401:
+          description: (Unauthorized) El usuario no ha iniciado sesión o esta expiró.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        422:
+          description: (Unprocessable Entity) - El usuario ya tiene una empresa registrada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+         description: Error en el servidor
+        
+    get:
+      tags:
+      - companies
+      summary: Muestra la empresa que le pertenece al usuario actualmente logeado.
+      parameters:
+      - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: (OK) Se consulto la empresa correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkCompaniesGet'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          description: El usuario logeado no tiene empresas registradas aún.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/responses/ServerError'
+          
+  /companies/{id}:
+    get:
+      tags:
+      - companies
+      summary: Muestra la empresa del usuario logeado y qu coincide con el id enviado por el path.
+      parameters:
+      - $ref: '#/components/parameters/token'
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: ID de la empresa a buscar.
+      responses:
+        200:
+          description: (OK) Se consulto la empresa correctamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkCompaniesGet'
+        401:
+          description: Se está intentando acceder a la informacón de una empresa que no pertenece al usuario logeado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: No se encontro una empresa con el {id} para el usuario logeado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/responses/ServerError'
+  /workers:
+    post:
+      tags:
+      - workers
+      summary: Registra un empleado en la base de datos que pertenecerá a al empresa del usuario actualmente logeado.
+      parameters:
+      - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyRegisterWorker'
+        required: true
+      responses:
+        201:
+          description: (OK) el empleado se registro correctamente en la base de datos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkRegisterWorkerPost'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
+        500:
+          $ref: '#/components/responses/ServerError'
+          
+    get:
+      tags:
+      - workers
+      summary: Muestra todos los empleados registrados que tiene la empresa del usuario actualmente logeado.
+      parameters:
+      - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: La información se obtuvo correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      company:
+                        type: string
+                        description: Empresa a la que pertenecen los empleados.
+                      workers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: Nombre del empleado
+                            cc:
+                              type: string
+                              description: Cedula de Ciudadania del empleado.
+                            salary:
+                              type: integer
+                              description: Salario del empleado
+                            laboral_risk:
+                              type: integer
+                              description: Tipo de riesgo laboral del empleado.
+                        description: Arreglo con todos los empleados de la empresa.
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
+        500:
+          $ref: '#/components/responses/ServerError'
+    
+  /periods:
+    post:
+      tags:
+      - periods
+      summary: Crea un periodo de nómina
+      parameters:
+      - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyCreatePeriod'
+        required: true
+      responses:
+        200:
+          description: Se creó correctamente el periodo de nómina
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      year:
+                        type: integer
+                        description: Año del periodo de nómina creado
+                      period:
+                        type: string
+                        description: Fecha de inicio del periodo y fecha de finalización del periodo
+          
+        401:
+          $ref: '#/components/responses/Unauthorized'
+          
+        404:
+         $ref: '#/components/responses/NotFound'
+                    
+        422:
+            $ref: '#/components/responses/UnprocessableEntity'
+          
+        500:
+          $ref: '#/components/responses/ServerError'
+          
+    get:
+      tags:
+      - periods
+      summary: Muestra todos los periodos creados para la empresa del usuario actualmente logeado.
+      parameters:
+      - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: (OK) Se obtuvieron los periodos correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkGetAllPeriods'
+        
+        401:
+          $ref: '#/components/responses/Unauthorized'
+          
+        404:
+          $ref: '#/components/responses/NotFound'
+          
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
+          
+        500:
+          $ref: '#/components/responses/ServerError'
+          
+  /modifications:
+    post:
+      tags:
+      - payroll_modifications
+      summary: Crea una modificación de nómina para un empleado en el periodo actual.
+      parameters:
+      - $ref: '#/components/parameters/token'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requestBodyCreateModification'
+      responses:
+        200:
+          description: Se creó correctamente la modificación de nómina.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkCreateModification'
+        
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        
+        404:
+          $ref: '#/components/responses/NotFound'
+          
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
+          
+        500:
+          $ref: '#/components/responses/ServerError'
+        
+    get:
+      tags:
+      - payroll_modifications
+      summary: Muestra todas las modificaciones realizadas en el periodo actual
+      parameters:
+      - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: (OK) Se obtuvo correctamente la información
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkGetAllModifications'
+                
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        
+        404:
+          $ref: '#/components/responses/NotFound'
+          
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
+          
+        500:
+          $ref: '#/components/responses/ServerError'
+          
+  /payrolls:
+    post:
+      tags:
+      - payrolls
+      summary: Liquida nómina para le periodo actual
+      parameters:
+      - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Se liquidó nómina correctamente,
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        description: Mensaje indicando que se liquidó nómina correctamente.
+                
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        
+        404:
+          $ref: '#/components/responses/NotFound'
+          
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
+          
+        500:
+          $ref: '#/components/responses/ServerError'
+          
+    get:
+      tags:
+      - payrolls
+      summary: Muestra todas las nóminas que perteneces a la empresa del usuario actualmente logeado.
+      parameters:
+      - $ref: '#/components/parameters/token'
+      responses:
+        200:
+          description: Se obtuvo la información de las nóminas correctamente.
+          content:
+            applciation/json:
+              schema:
+                $ref: '#/components/schemas/OkGetAllPayrolls'
+                
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        
+        404:
+          $ref: '#/components/responses/NotFound'
+          
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
+          
+        500:
+          $ref: '#/components/responses/ServerError'
+          
+  /payrolls/{id}:
+    get:
+      tags:
+      - payrolls
+      summary: Muestra una nómina especifica según el id pasado por la ruta.
+      parameters:
+      - $ref: '#/components/parameters/token'
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+        description: ID de la nómina a buscar.
+      responses:
+        200:
+          description: (OK) Se obtuvo correctamente la nómina buscada.
+          content:
+            applciation/json:
+              schema:
+                $ref: '#/components/schemas/OkShowPayroll'
+                
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        
+        404:
+          $ref: '#/components/responses/NotFound'
+          
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
+          
+        500:
+          $ref: '#/components/responses/ServerError'
+          
+components:
+  responses:
+    Unauthorized:
+      description: (Unauthorized) No está logeado o el token expiró.
+      content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: (NotFound) No se encontró la información solicitada.
+      content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+
+    BadRequest:
+      description: (BadRequest) Hay errores en el body.
+      content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+              
+    UnprocessableEntity:
+      description: (UnprocessableEntity) No se pudo guardar el registro en la base de datos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ServerError:
+      description: Error en el servidor.
+      
+  parameters:
+    token:
+        name: token
+        in: header
+        description: Token de autenticación
+        required: true
+  
+  schemas:
+    BodyUsersPost:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nombre del usuario a registrar.
+            email:
+              type: string
+              description: Correo electrónico del usuario a registrar.
+            password:
+              type: string
+              description: Contraseña del usuario a registrar.
+              
+    requestBodyCreateModification:
+      type: object
+      properties:
+        modification:
+          type: object
+          properties:
+            worker_id:
+              type: integer
+              description: ID del empleado al que pertenece la modificación a crear.
+            other_salary_incomes:
+              type: integer
+              description: Ingresos salariales adicionales.
+            no_salary_incomes:
+              type: integer
+              description: Ingresos no salariales adicionales.
+            deductions:
+              type: integer
+              description: Deducciones adicionales al empleado.
+              
+    RequestBodyCreatePeriod:
+      type: object
+      properties:
+        period:
+          type: object
+          properties:
+            year:
+              type: integer
+              description: Año del periodo de nómina (debe ser entre el 2000 y 2022).
+            month:
+              type: integer
+              description: Mes del periodo de nómina.
+              
+    RequestBodyRegisterWorker:
+      type: object
+      properties:
+        worker:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nombre del empleado a crear.
+            cc:
+              type: integer
+              description: Cedula de ciudadanía de empleado a registrar.
+            salary:
+              type: integer
+              description: Salario del empleado a registrar.
+            risk:
+              type: integer
+              description: Tipo de riesgo laboral del empleado.
+              
+    BodyRegisterCompany:
+      type: object
+      properties:
+        company:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nombre de la empresa a registrar
+            nit:
+              type: integer
+              description: NIT de la empresa a registrar
+    
+    BodyLoginPost:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email del usuario que desea iniciar sesión.
+        password:
+          type: string
+          description: Contraseña que corresponde al email del usuario que desea iniciar sesión.
+          
+    OkShowPayroll:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            payroll:
+              type: object
+              properties:
+                period:
+                  type: string
+                  description: Periodo de la nómina encontrada.
+                total_payrolls:
+                  type: integer
+                  description: Monto total que pago la empresa por concepto de nóminas de sus empleados.
+                benefits_and_social_security:
+                  type: integer
+                  description: Monto total que pago la empresa por concepto de prestaciones y seguridad social.
+                total_company_cost:
+                  type: integer
+                  description: Total de gastos que tuvo al empresa por concepto de nómina en ese periodo.
+                employees:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: Nombre del empleado
+                      employee_payment:
+                        type: integer
+                        description: Pago al empleado en ese periodo
+                      total_deductions:
+                        type: integer
+                        description: Deducciones al empleado por conceptos de salud, pension, fondo de solidaridad (si aplica), fondo de subsistencia (si aplica) y deducciones adicionales.
+                      payroll_modification:
+                        type: object
+                        properties:
+                          other_salary_incomes:
+                            type: integer
+                            description: Ingresos salariales adicionales de la modificación de nómina creada
+                          no_salary_incomes:
+                            type: integer
+                            description: Ingresos no salariales adicionales de la modificación de nómina creada
+                          deductions:
+                            type: integer
+                            description: Deducciones adicionales de la modificación de nómina creada
+          
+    OkGetAllPayrolls:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            payrolls:
+              type: array
+              items:
+                type: object
+                properties:
+                  "1-31/January/2021":
+                    type: object
+                    properties:
+                      total_payrolls:
+                        type: integer
+                        description: Monto total que pago la empresa por concepto de nóminas de sus empleados.
+                      benefits_and_social_security:
+                        type: integer
+                        description: Monto total que pago la empresa por concepto de prestaciones y seguridad social.
+                      total_company_cost:
+                        type: integer
+                        description: Total de gastos que tuvo al empresa por concepto de nómina en ese periodo.
+                      employees:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: Nombre del empleado
+                            employee_payment:
+                              type: integer
+                              description: Pago al empleado en ese periodo
+                            total_deductions:
+                              type: integer
+                              description: Deducciones al empleado por conceptos de salud, pension, fondo de solidaridad (si aplica), fondo de subsistencia (si aplica) y deducciones adicionales.
+                            payroll_modification:
+                              type: object
+                              properties:
+                                other_salary_incomes:
+                                  type: integer
+                                  description: Ingresos salariales adicionales de la modificación de nómina creada
+                                no_salary_incomes:
+                                  type: integer
+                                  description: Ingresos no salariales adicionales de la modificación de nómina creada
+                                deductions:
+                                  type: integer
+                                  description: Deducciones adicionales de la modificación de nómina creada
+                
+                
+              description: Arreglo con todas las nóminas del periodo
+            
+          
+    OkGetAllModifications:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            modifications:
+              type: array
+              items:
+                type: object
+                properties:
+                  period:
+                    type: string
+                    description: Periodo en el que se realizó la modificación de nómina
+                  employee:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: Nombre del empleado al que pertenece la modificación de nómina.
+                      cc:
+                        type: integer
+                        description: Cedula de Ciudadania del empleado al que pertenece la modificacion de nómina.
+                    description: Objeto con las propiedades del usuario al que pertenece la modificación de nómina.
+                  other_salary_incomes:
+                    type: integer
+                    description: Ingresos salariales adicionales de la modificación de nómina creada
+                  no_salary_incomes:
+                    type: integer
+                    description: Ingresos no salariales adicionales de la modificación de nómina creada
+                  deductions:
+                    type: integer
+                    description: Deducciones adicionales de la modificación de nómina creada
+          
+    OkCreateModification:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            modification:
+              type: object
+              properties:
+                period:
+                  type: string
+                  description: Periodo en el que se realizó la modificación.
+                worker_id:
+                  type: integer
+                  description: ID del empleado al que pertenece la modificación de nómina
+                other_salary_incomes:
+                  type: integer
+                  description: Ingresos salariales adicionales de la modificación de nómina creada
+                no_salary_incomes:
+                  type: integer
+                  description: Ingresos no salariales adicionales de la modificación de nómina creada
+                deductions:
+                  type: integer
+                  description: Deducciones adicionales de la modificación de nómina creada
+          
+    OkGetAllPeriods:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            periods:
+              type: array
+              items:
+                type: object
+                properties:
+                  "1-31/January/2021":
+                    type: object
+                    description: Periodo de nómina
+                    properties:
+                      payroll:
+                        type: object
+                        properties:
+                          total_payrolls:
+                            type: integer
+                            description: Monto total que pago la empresa por concepto de nóminas de sus empleados.
+                          benefits_and_social_security:
+                            type: integer
+                            description: Monto total que pago la empresa por concepto de prestaciones y seguridad social.
+                          total_company_cost:
+                            type: integer
+                            description: Total de gastos que tuvo al empresa por concepto de nómina en ese periodo.
+              description: Arreglo con todos los periodos de la empresa que pertenece al usuario actualmente logeado.
+                  
+                
+          
+    OkShowWorker:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            cc:
+              type: string
+              description: Cedula de Ciudadania del empleado.
+            name:
+              type: string
+              description: Nombre del empleado
+            company:
+              type: string
+              description: Nombre de la empresa a la que pertenece el empleado creado.
+            salary:
+              type: integer
+              description: Salario del empleado
+            laboral_risk:
+              type: integer
+              description: Tipo de riesgo laboral del empleado.
+          
+    OkRegisterWorkerPost:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            cc:
+              type: string
+              description: Cedula de Ciudadania del empleado.
+            name:
+              type: string
+              description: Nombre del empleado
+            company:
+              type: string
+              description: Nombre de la empresa a la que pertenece el empleado creado.
+            salary:
+              type: integer
+              description: Salario del empleado
+            laboral_risk:
+              type: integer
+              description: Tipo de riesgo laboral del empleado.
+          
+    OkCompaniesGet:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nombre de la empresa del usuario logeado.
+            NIT:
+              type: integer
+              description: NIT de la empresa del usuario logeado.
+            owner:
+              type: string
+              description: Nombre del propietario de la empresa.
+            employees:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Nombre del empleado
+                  cc:
+                    type: string
+                    description: Cedula de Ciudadania del empleado.
+                  salary:
+                    type: integer
+                    description: Salario del empleado
+                  laboral_risk:
+                    type: integer
+                    description: Tipo de riesgo laboral del empleado.
+              description: Arreglo con todos los empleados de la empresa.
+          
+    OkRegisterCompanyPost:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nombre de la empresa creada.
+            nit:
+              type: integer
+              description: NIT de la empresa creada.
+    
+    OkUsersPost:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Nombre del usuario que se registró.
+            email:
+              type: string
+              description: Correo electrónico del usuairo que se registró.
+              
+    OkLoginPost:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Token de autenticación para el usuario que inició sesión.
+            name:
+              type: string
+              description: Nombre del usuario que inició sesión
+              
+    
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Codigo personalizado para identificar el error.
+            message:
+              type: string
+              description: Mensaje descriptivo acerca del error.
+            object:
+              type: string
+              description: Objeto en el que se presenta el error
+          
+      
