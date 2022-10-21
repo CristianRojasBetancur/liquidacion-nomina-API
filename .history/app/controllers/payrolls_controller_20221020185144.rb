@@ -47,8 +47,6 @@ class PayrollsController < ApplicationController
         @payroll = period.payrolls.find_by(id: params[:id])
 
         unless @payroll.nil?
-          break
-        end
       end
 
       if @payroll.nil?

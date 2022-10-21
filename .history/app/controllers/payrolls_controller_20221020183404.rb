@@ -41,22 +41,13 @@ class PayrollsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_payroll
-      @payroll = nil
-
-      @current_user.company.periods.each do |period|
-        @payroll = period.payrolls.find_by(id: params[:id])
-
-        unless @payroll.nil?
-          break
-        end
-      end
+      @payroll = @current_user.company.periods.last.payrolls.find_by(id: params[:id])
 
       if @payroll.nil?
         render json: {error: {
           code: "037",
-          message: "Couldn't find payroll with id #{params[:id]} for #{@current_user.company.name} company",
-          object: "Payroll"
-        }}, status: 404
+          message: "Couldn't find payroll with id #{params[:id]} for #{@current_user.company.name} company"
+        }}
       end
     end
 end

@@ -3,7 +3,6 @@ class AuthController < ApplicationController
   before_action :authorize_request, except: :login
 
   def login
-    begin
       @user = User.find_by_email(params[:email])
       if @user&.authenticate(params[:password])
         token = encode(user_id: @user.id)
@@ -15,13 +14,6 @@ class AuthController < ApplicationController
                             message: 'Wrong credentials',
                             object: "User"}}, status: :unauthorized
       end
-    rescue ActionDispatch::Http::Parameters::ParseError
-      render json: {error: {
-        code: "024",
-        message: "Bad request",
-        object: "BodyRequest"
-      }}, status: 400
-    end
   end
 
   private

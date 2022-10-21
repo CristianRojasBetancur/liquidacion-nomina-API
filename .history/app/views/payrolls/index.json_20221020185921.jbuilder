@@ -12,7 +12,7 @@ json.data do
               json.name pr.worker.name
               json.employee_payment pr.employeed_payment
               json.total_deductions pr.reten_deduc
-              if pr.worker.modification && pr.worker.modification.period.id == pr.period.id
+              if pr.worker.modification
                 json.payroll_modification do
                   json.other_salary_incomes pr.worker.modification.other_salary_incomes
                   json.no_salary_incomes pr.worker.modification.no_salary_incomes

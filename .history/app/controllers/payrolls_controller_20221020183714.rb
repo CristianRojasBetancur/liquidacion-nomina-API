@@ -44,11 +44,7 @@ class PayrollsController < ApplicationController
       @payroll = nil
 
       @current_user.company.periods.each do |period|
-        @payroll = period.payrolls.find_by(id: params[:id])
-
-        unless @payroll.nil?
-          break
-        end
+        @payroll = period.payrolls.select({ |payroll| payroll.id == params[:id]})
       end
 
       if @payroll.nil?

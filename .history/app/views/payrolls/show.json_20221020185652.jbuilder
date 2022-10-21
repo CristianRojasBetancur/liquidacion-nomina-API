@@ -9,7 +9,7 @@ json.data do
       worker.payrolls.select{ |p| p.period.id == @payroll.period.id }.each do |pr|
         json.name pr.worker.name
         json.employee_payment pr.employeed_payment
-        json.total_deductions pr.reten_deduc
+        json.deductions pr.reten_deduc
         if pr.worker.modification
           json.payroll_modification do
             json.other_salary_incomes pr.worker.modification.other_salary_incomes

@@ -14,13 +14,6 @@ class AuthController < ApplicationController
         render json: {error: {code: "002",
                             message: 'Wrong credentials',
                             object: "User"}}, status: :unauthorized
-      end
-    rescue ActionDispatch::Http::Parameters::ParseError
-      render json: {error: {
-        code: "024",
-        message: "Bad request",
-        object: "BodyRequest"
-      }}, status: 400
     end
   end
 
