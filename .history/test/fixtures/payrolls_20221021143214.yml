@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  period: one
+  employeed_payment: 1
+  reten_deduc: 1
+  total_payrolls: 1
+  social_benefits: 1
+  parafiscal_cont: 1
+  social_security: 1
+  worker: one
+
+two:
+  period: one
+  employeed_payment: 1
+  reten_deduc: 1
+  total_payrolls: 1
+  social_benefits: 1
+  parafiscal_cont: 1
+  social_security: 1
+  worker: two
