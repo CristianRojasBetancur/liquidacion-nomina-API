@@ -10,4 +10,7 @@ Rails.application.routes.draw do
 
   # Auth route
   post '/login', to: "auth#login"
+
+  mount Rswag::Ui::Engine => "/api-docs"
+  mount Rswag::Api::Engine => "/api-docs"
 end
