@@ -38,7 +38,7 @@ class CompaniesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "shouldn't create invalid company" do
-    token = auth_token_for_user(@other_valid_user)
+    token = auth_token_for_user()
     post '/companies',
       params: { @company },
       headers: {
@@ -52,5 +52,18 @@ class CompaniesControllerTest < ActionDispatch::IntegrationTest
       Authorization: @token
     }, as: :json
     assert_response :success
+  end
+
+  test "should update company" do
+    patch company_url(@company), params: { company: { name: @company.name, nit: @company.nit, user_id: @company.user_id } }, as: :json
+    assert_response :success
+  end
+
+  test "should destroy company" do
+    assert_difference("Company.count", -1) do
+      delete company_url(@company), as: :json
+    end
+
+    assert_response :no_content
   end
 end

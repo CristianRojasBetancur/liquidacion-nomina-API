@@ -15,9 +15,9 @@ module AuthorizationHelper
       email: user[:email],
       password: 'combinacion123'
     }, as: :json
-    
+      puts "************* #{parse_response_body(response)['data']['token']} ***************"
     # The three categories below are the ones you need as authentication headers.
-    parse_response_body(response)['data']['token']
+    response.body["data"]["token"]
   end
 
   private

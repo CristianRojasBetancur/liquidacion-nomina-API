@@ -5,6 +5,8 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
 
   def setup
     @valid_user = users(:valid_user)
+    login(@valid_user)
+    @token = auth_token_for_user(@valid_user)
     @invalid_user = users(:invalid_user)
   end
 

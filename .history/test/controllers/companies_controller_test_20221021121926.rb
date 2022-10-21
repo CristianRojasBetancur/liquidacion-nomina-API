@@ -53,4 +53,17 @@ class CompaniesControllerTest < ActionDispatch::IntegrationTest
     }, as: :json
     assert_response :success
   end
+
+  test "should update company" do
+    patch company_url(@company), params: { company: { name: @company.name, nit: @company.nit, user_id: @company.user_id } }, as: :json
+    assert_response :success
+  end
+
+  test "should destroy company" do
+    assert_difference("Company.count", -1) do
+      delete company_url(@company), as: :json
+    end
+
+    assert_response :no_content
+  end
 end

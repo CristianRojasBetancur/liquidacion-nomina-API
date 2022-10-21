@@ -6,16 +6,11 @@ class CompaniesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @valid_user = users(:valid_user)
     @invalid_user = users(:invalid_user)
-    @other_valid_user = users(:other_valid_user)
 
     login(@valid_user)
 
     @token = auth_token_for_user(@valid_user)
-    @valid_company = {
-      name: "Nominapp",
-      nit: "123",
-      user_id: users(:other_valid_user).id
-    }
+    @company = companies(:one)
   end
 
   test "should get index" do
@@ -26,25 +21,12 @@ class CompaniesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create company" do
-    token = auth_token_for_user(users(:other_valid_user))
-
     assert_difference("Company.count") do
       post '/companies', 
-        params: { company: @valid_company }, headers: {
-          Authorization: token
-        }, as: :json
-        assert_response :created
+        params: { company: { name: @company.name, nit: @company.nit, user_id: @company.user_id } }, as: :json
     end
-  end
 
-  test "shouldn't create invalid company" do
-    token = auth_token_for_user(@other_valid_user)
-    post '/companies',
-      params: { @company },
-      headers: {
-        Authorization: token
-      }, as: :json
-      assert_response :unprocessable_entity
+    assert_response :created
   end
 
   test "should show company" do
@@ -52,5 +34,18 @@ class CompaniesControllerTest < ActionDispatch::IntegrationTest
       Authorization: @token
     }, as: :json
     assert_response :success
+  end
+
+  test "should update company" do
+    patch company_url(@company), params: { company: { name: @company.name, nit: @company.nit, user_id: @company.user_id } }, as: :json
+    assert_response :success
+  end
+
+  test "should destroy company" do
+    assert_difference("Company.count", -1) do
+      delete company_url(@company), as: :json
+    end
+
+    assert_response :no_content
   end
 end

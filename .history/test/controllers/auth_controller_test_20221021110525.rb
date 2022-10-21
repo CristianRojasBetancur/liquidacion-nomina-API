@@ -4,7 +4,12 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
   include AuthorizationHelper
 
   def setup
-    @valid_user = users(:valid_user)
+    @valid_user = {
+      email: users(:valid_user).email,
+      password: users(:valid_user).password_digest
+    }
+    login(@valid_user)
+    @token = auth_token_for_user(@valid_user)
     @invalid_user = users(:invalid_user)
   end
 

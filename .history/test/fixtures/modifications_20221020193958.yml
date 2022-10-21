@@ -8,7 +8,7 @@ one:
   deductions: 1
 
 two:
-  period: one
+  period: two
   worker: two
   other_salary_incomes: 1
   no_salary_incomes: 1

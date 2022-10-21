@@ -4,11 +4,6 @@ valid_user:
   email: mariana@mariana.com
   password_digest: <%= BCrypt::Password.create('combinacion123') %>
 
-other_valid_user:
-  name: Tomas
-  email: tomas@tomas.com
-  password_digest: <%= BCrypt::Password.create('combinacion123') %>
-
 invalid_user:
   name: Andres
   email: andres@andres.com

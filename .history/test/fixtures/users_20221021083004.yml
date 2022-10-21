@@ -1,15 +1,21 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: Mariana
+  email: mariana@mariana.com
+  password_digest: combinacion123
+
+two:
+  name: Cristian
+  email: cristian@cristian.com
+  password_digest: combinacion123
+
 valid_user:
   name: Mariana
   email: mariana@mariana.com
-  password_digest: <%= BCrypt::Password.create('combinacion123') %>
-
-other_valid_user:
-  name: Tomas
-  email: tomas@tomas.com
-  password_digest: <%= BCrypt::Password.create('combinacion123') %>
+  password_digest: combinacion123
 
 invalid_user:
-  name: Andres
+  name: Mariana
   email: andres@andres.com
   password_digest: <%= BCrypt::Password.create('combinacion1234') %>

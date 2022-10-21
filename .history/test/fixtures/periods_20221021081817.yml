@@ -1,6 +1,6 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: Coca-Cola
-  nit: 123456
-  user: valid_user
+  year: 2020
+  month: 1
+  company: one

@@ -1,16 +1,16 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: Alejandro
-  cc: 1234
+  name: MyString
+  cc: MyString
   salary: 1000000
   company: one
   risk: 1
   transport_subsidy: no
 
 two:
-  name: Luisa
-  cc: 123
+  name: MyString
+  cc: MyString
   salary: 1000000
   company: one
   risk: 1

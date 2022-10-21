@@ -2,27 +2,17 @@ module AuthorizationHelper
   def login(user)
     # The argument 'user' should be a hash that includes the params 'email' and 'password'.
     post '/login',
-      params: {
-        email: user[:email],
-        password: 'combinacion123'
-      }, as: :json
+      params: { email: user[:email],
+                password: BCrypt::Password.create('combinacion123') },
+      as: :json
   end
 
   def auth_token_for_user(user)
     # The argument 'user' should be a hash that includes the params 'email' and 'password'.
     post '/login',
-    params: {
-      email: user[:email],
-      password: 'combinacion123'
-    }, as: :json
-    
+      params: { email: user[:email], password: user[:password] },
+      as: :json
     # The three categories below are the ones you need as authentication headers.
-    parse_response_body(response)['data']['token']
-  end
-
-  private
-
-  def parse_response_body(response)
-    JSON.parse(response.body)
+    response.headers.slice('client', 'access-token', 'uid')
   end
 end
